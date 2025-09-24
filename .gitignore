@@ -1,0 +1,27 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+
+# do not ignore *csv.dvc files
+*.idea
+.venv/
+!*.csv.dvc
+.direnv
+.envrc
+.DS_Store
+.dvc
+.ipynb_checkpoints/
+inputs/msm_outputs_links/
+inputs/msm_outputs_mx/
+outputs/
+akl-touch/
+# biogeme outputs
+*.iter
+*.html
+*.pickle
+biogeme.toml
+quarto/*/
+
+formatted_data
+raw_data
+result
+dag.png
