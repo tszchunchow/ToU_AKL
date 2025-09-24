@@ -10,6 +10,9 @@ __pycache__/
 .DS_Store
 .dvc
 .ipynb_checkpoints/
+inputs/agg_mx/
+inputs/charged_vehicles/
+inputs/emme_links/
 inputs/msm_outputs_links/
 inputs/msm_outputs_mx/
 outputs/
