@@ -1,0 +1,28 @@
+﻿Link_Type,Description,Group_1,Group_2,Display
+1,Centroid Connector,Connector,Connector,
+2,"Walk-only links, including centroid connectors",Walk,Walk,PT
+3,"Multi-mode PT access, p-connectors",PT Access,PT Access,PT
+4,Bus-only links,Bus,Bus,PT
+5,Ferry links,Ferry,Ferry,PT
+6,Ferry links,Ferry,Ferry,PT
+7,Rail links,Rail,Rail,PT
+8,-,,,
+9,-,,,
+10,LRT-only links,LRT,LRT,PT
+11,CBD/Shopping – high friction,Local,Local,Minor
+12,CBD/Shopping – low friction,Local,Local,Minor
+13,Local street,Local,Local,Minor
+14,Collector – high friction/poor alignment,Local,Local,Minor
+15,Collector – low friction/good alignment,Local,Local,Minor
+16,Urban arterial – low speed,Arterial,Arterial/Expressway,Major
+17,Urban arterial – high speed,Arterial,Arterial/Expressway,Major
+18,Expressway,Motorway,Arterial/Expressway,Major
+19,Motorway,Motorway,Motorway,Major
+20,On-ramp,Motorway,Motorway,Major
+21,Off-ramp,Motorway,Motorway,Major
+22,Rural – level,Rural,Rural,Minor
+23,Rural – rolling,Rural,Rural,Minor
+24,Rural – mountainous,Rural,Rural,Minor
+25,Rural highway – townships,Rural,Rural,Major
+26,Rural highway,Rural,Rural,Major
+27,Rural Other,Rural,Rural,Minor

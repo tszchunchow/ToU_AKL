@@ -1,0 +1,15 @@
+﻿Slot No.,Charge Level,MSM Scenario Name,Scenario,Scenario_Code
+1,,,2016,2016
+14,$0 ,TOUCH_base_AGSv1_E23B,C_Baseline,C_Baseline_0
+16,$0 ,TOUCH_base_AGSv1_E23B_NC,Baseline,Baseline_0
+18,$0 ,TOUCH_Base_4_3Ca,Baseline_3C,Baseline_3C_0
+20,$3.00 ,TOUCH_Option_1A,1A,1A_300
+22,t,TOUCH_Option_1A_tv,1A,1A_t
+30,$2.00 ,TOUCH_Option_1C,1C,1C_200
+40,$3.00 ,TOUCH_Option_2C,2C,2C_300
+50,$6.00 ,TOUCH_Option_3B_P2,3B,3B_600
+60,m,TOUCH_Option_3C1a_P2,3C,3C_m
+62,$6.00 ,TOUCH_Option_3C2a_P2_150,3C,3C_600
+70,m,TOUCH_Option_3E_P2,3E,3E_m
+80,m,TOUCH_Option_3H_P2,3H,3H_m
+82,mt,TOUCH_Option_3H_P2_tv,3H,3H_mt

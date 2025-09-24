@@ -1,0 +1,148 @@
+---
+title: "Network Assessment"
+format: 
+  dashboard:
+    theme: [cosmo, custom.scss]
+    orientation: columns
+
+server: shiny
+---
+```{python}
+#| context: setup
+import sys
+sys.path.append('../src')
+
+from shiny import render, reactive, ui
+from shinywidgets import output_widget, reactive_read, render_plotly, render_widget
+import pandas as pd
+import geopandas as gpd
+import glob
+import duckdb
+import folium
+from utils import *
+from IPython.display import Markdown
+
+congestion_metrics_am = pd.read_parquet(f'{CONGESTION_METRICS_DIR}/congestion_metrics_AM.parquet').reset_index()
+congestion_metrics_ip = pd.read_parquet(f'{CONGESTION_METRICS_DIR}/congestion_metrics_IP.parquet').reset_index()
+congestion_metrics_pm = pd.read_parquet(f'{CONGESTION_METRICS_DIR}/congestion_metrics_PM.parquet').reset_index()
+
+trips_mx = pd.read_parquet(f'{THROUGHPUT_METRICS_DIR}/trips_mx.parquet')
+journey_time_mx = pd.read_parquet(f'{THROUGHPUT_METRICS_DIR}/trips_mx.parquet')
+tolls_mx = pd.read_parquet(f'{THROUGHPUT_METRICS_DIR}/tolls_mx.parquet')
+```
+
+# {.sidebar}
+```{python}
+ui.input_select("period", "Peak Period:", choices=PERIOD_LIST)
+ui.input_select("scenario", "Scenario:", choices=SCENARIO_LIST)
+```
+
+```{python}
+@reactive.Calc
+def period_code():
+  return PERIOD_MAP[input.period()]
+
+@reactive.Calc
+def scen_code():
+  return SCENARIO_MAP[input.scenario()]
+
+@reactive.Calc
+def model_code():
+  return str(YEAR) + str(period_code()) + str(scen_code())
+
+@reactive.Calc
+def get_congestion_metrics_df():
+  if input.period() == "AM":
+    return congestion_metrics_am
+  elif input.period() == "IP":
+    return congestion_metrics_ip
+  else:
+    return congestion_metrics_pm
+
+@reactive.Calc
+def congested_road_network():
+  return get_congestion_metrics_df()[['Group_2', 'Sector_Name', f'CONG_ROAD_KM_{model_code()}']].pivot(index='Sector_Name', columns='Group_2', values = f'CONG_ROAD_KM_{model_code()}').reset_index()
+
+@reactive.Calc
+def vkt():
+  return get_congestion_metrics_df()[['Group_2', 'Sector_Name', f'VKT_{model_code()}']].pivot(index='Sector_Name', columns='Group_2', values = f'VKT_{model_code()}').reset_index()
+
+@reactive.Calc
+def trips_map():
+  col = 'Trips_' + '26116' + '_Car'
+  trip_origins_df = trips_mx.groupby(['origin']).agg({col: 'sum'}).reset_index().merge(MSM_ZONES[['MSM2018', 'geometry']], left_on='origin', right_on='MSM2018')
+  trip_origins_gdf = gpd.GeoDataFrame(trip_origins_df, geometry='geometry', crs='epsg:2193').to_crs('epsg:4326') 
+
+  m = folium.Map(location=[45.5236, -122.6750], zoom_start=13)
+  folium.Choropleth(
+    geo_data=trip_origins_gdf,
+    name='choropleth',
+    data=trip_origins_gdf,
+    columns=['origin', col],  # Columns in data to map to GeoJSON
+      key_on=f'feature.properties.origin',  # This is the key in the GeoJSON file
+    fill_color='YlGn',  # Color scale
+    fill_opacity=0.9,
+    line_opacity=0.2,
+    legend_name='Trip Origins',
+    smooth_factor=0
+    ).add_to(m)
+
+  style_function = lambda x: {'fillColor': '#ffffff', 
+                              'color':'#000000', 
+                              'fillOpacity': 0.1, 
+                              'weight': 0.1}
+  highlight_function = lambda x: {'fillColor': '#000000', 
+                                  'color':'#000000', 
+                                  'fillOpacity': 0.50, 
+                                  'weight': 0.1}
+  NIL = folium.features.GeoJson(
+      trip_origins_gdf,
+      style_function=style_function, 
+      control=False,
+      highlight_function=highlight_function, 
+      tooltip=folium.features.GeoJsonTooltip(
+          fields=['origin', f'Trips_{model_code}_Car'],
+          aliases=['Origin Zone: ','Total number of trips: '],
+          style=("background-color: white; color: #333333; font-family: arial; font-size: 12px; padding: 10px;") 
+      )
+  )
+
+  m.add_child(NIL)
+  m.keep_in_front(NIL)
+
+  return m._repr_html_()
+```
+
+# Congestion
+```{python}
+#| title: Congested 
+#| height: 100%
+#| padding: 0;
+#| 
+@render.data_frame
+def show_congested_network():
+  return render.DataGrid(congested_road_network())
+```
+
+```{python}
+#| title: VKT
+#| height: 100%
+#| padding: 0;
+#| 
+@render.data_frame
+def show_vkt():
+  return render.DataGrid(vkt())
+```
+
+# Throughput / Travel Time
+```{python}
+#| title: Trip Origin
+#| height: 100%
+#| padding: 0;
+#| 
+@render.text
+def show_trip_map():
+    return trips_map()
+```
+
+# Accessibility
